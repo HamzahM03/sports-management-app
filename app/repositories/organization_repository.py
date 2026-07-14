@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models.organization import Organization
 
-from app.schemas.organization_schema import OrganizationCreate
+from app.schemas.organization_schema import OrganizationCreate, OrganizationUpdate
 
 class OrganizationRepository:
 
@@ -43,3 +43,29 @@ class OrganizationRepository:
     ) -> list[Organization]:
 
         return db.query(Organization).all()
+    
+    @staticmethod
+    def update(
+        db: Session,
+        organization: Organization,
+        organization_data: OrganizationUpdate,
+    ) -> Organization:
+
+        update_data = organization_data.model_dump(exclude_unset=True)
+
+        for field, value in update_data.items():
+            setattr(organization, field, value)
+
+        db.commit()
+        db.refresh(organization)
+
+        return organization
+    
+    @staticmethod
+    def delete(
+        db: Session,
+        organization: Organization,
+    ) -> None:
+
+        db.delete(organization)
+        db.commit()

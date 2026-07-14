@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.exceptions import OrganizationNotFoundError
 from app.models.organization import Organization
 from app.repositories.organization_repository import OrganizationRepository
-from app.schemas.organization_schema import OrganizationCreate
+from app.schemas.organization_schema import OrganizationCreate, OrganizationUpdate
 
 
 class OrganizationService:
@@ -41,3 +41,38 @@ class OrganizationService:
     ) -> list[Organization]:
 
         return OrganizationRepository.get_all(db=db)
+    
+    @staticmethod
+    def update_organization(
+        db: Session,
+        organization_id: int,
+        organization_data: OrganizationUpdate,
+    ) -> Organization:
+
+        organization = OrganizationService.get_organization(
+            db=db,
+            organization_id=organization_id,
+        )
+
+        return OrganizationRepository.update(
+            db=db,
+            organization=organization,
+            organization_data=organization_data,
+        )
+    
+    
+    @staticmethod
+    def delete_organization(
+        db: Session,
+        organization_id: int,
+    ) -> None:
+
+        organization = OrganizationService.get_organization(
+            db=db,
+            organization_id=organization_id,
+        )
+
+        OrganizationRepository.delete(
+            db=db,
+            organization=organization,
+        )
